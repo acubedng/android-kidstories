@@ -18,14 +18,14 @@ public class NightmodeActivity extends AppCompatActivity {
     //    This is supposed to change the view of the app from Light to Dark mode.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-       // getActionBar().setDisplayHomeAsUpEnabled(true);
-        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
-            setTheme(R.style.DarkTheme);
-        }
-        else setTheme(R.style.AppTheme);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nightmode);
         nightswitch = findViewById(R.id.night_switch);
+        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+            //setTheme(R.style.DarkTheme);
+            getDelegate().applyDayNight();
+        }
 
 
         if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {

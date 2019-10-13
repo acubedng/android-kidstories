@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorWhite"
     tools:context=".About">
 
     <RelativeLayout
@@ -63,6 +64,7 @@
             android:layout_weight="1"
             android:fontFamily="@font/comic_sans"
             android:gravity="center_vertical"
+            android:textColor="@color/colorBlack"
             android:text="Kiddies stories is a mobile app that gives the best of value to your child."
             android:textAlignment="center"
             android:textSize="14sp" />

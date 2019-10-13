@@ -3,6 +3,7 @@ package com.project.android_kidstories;
 import androidx.appcompat.app.AppCompatActivity;
 
 
+import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
@@ -142,5 +143,18 @@ public class OnBoardingActivity extends AppCompatActivity {
         btnNext.setVisibility(View.INVISIBLE);
         tabLayout.setVisibility(View.INVISIBLE);
         btnGetStarted.setVisibility(View.VISIBLE);
+    }
+
+    public static class StoryDetailActivity extends AppCompatActivity {
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_story_detail);
+
+            Toolbar toolbar = findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setTitle("Story Details");
+        }
     }
 }
