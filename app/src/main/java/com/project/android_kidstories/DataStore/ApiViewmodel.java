@@ -5,13 +5,6 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
-/**
- * @author .: Ehma Ugbogo
- * @email ..: ehmaugbogo@gmail.com
- * @created : 12/10/19
- */
-
-
 public class ApiViewmodel extends AndroidViewModel {
 
     private final Repository repository;
