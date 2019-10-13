@@ -8,8 +8,6 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import java.util.Objects;
-
 
 @Entity
 public class Story {
@@ -64,29 +62,6 @@ public class Story {
     @Expose
     @Ignore
     private Comments comments;
-
-    //****** Ehma Added Field ******//
-
-    private boolean liked;
-    private boolean disliked;
-
-    public boolean isLiked() {
-        return liked;
-    }
-
-    public void setLiked(boolean liked) {
-        this.liked = liked;
-    }
-
-    public boolean isDisliked() {
-        return disliked;
-    }
-
-    public void setDisliked(boolean disliked) {
-        this.disliked = disliked;
-    }
-
-    //****** ***********   ******//
 
     public int getId() {
         return id;
@@ -218,17 +193,4 @@ public class Story {
         this.comments = comments;
     }
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Story)) return false;
-        Story story = (Story) o;
-        return getId() == story.getId();
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId());
-    }
 }
