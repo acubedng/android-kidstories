@@ -14,6 +14,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 
 import com.google.android.material.tabs.TabLayout;
+import com.project.android_kidstories.Views.main.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;

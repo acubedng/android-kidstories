@@ -5,12 +5,8 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.project.android_kidstories.Model.Story;
 
 public class SingleStoryActivity extends AppCompatActivity {
 

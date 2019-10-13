@@ -3,11 +3,13 @@ package com.project.android_kidstories;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
-
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
@@ -18,79 +20,41 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.MessageDigest;
 import java.util.Arrays;
 
-import de.hdodenhof.circleimageview.CircleImageView;
-
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.Task;
+import com.project.android_kidstories.Views.main.MainActivity;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private static final String TAG = "AndroidClarified";
-
-
-
-
-
+    public static final int LOGIN_TEXT_REQUEST_CODE = 11;
+    private static final String TAG = "RegisterActivity";
     private CallbackManager callbackManager;
-
+    private static final String EMAIL = "email";
+    private static final String AUTH_TYPE = "rerequest";
 
     EditText emailET;
     EditText phone;
     EditText fullName;
     EditText password, confirmPassword;
     Button regFacebook, regGoogle, SignUp;
+    TextView loginText;
     ProgressBar progressBar;
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register);
-        phone = findViewById(R.id.reg_contact);
-        password = findViewById(R.id.reg_password);
-        fullName = findViewById(R.id.reg_full_name);
-        emailET = findViewById(R.id.reg_email);
-        confirmPassword = findViewById(R.id.reg_confirm_password);
-
-        regFacebook = findViewById(R.id.reg_facebook);
-        regGoogle = findViewById(R.id.reg_google);
-        SignUp = findViewById(R.id.sign_up_button);
-
-
-        callbackManager = CallbackManager.Factory.create();
-
-        checkLoginStatus();
-
-
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        callbackManager.onActivityResult(requestCode, resultCode, data);
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
     AccessTokenTracker tokenTracker = new AccessTokenTracker() {
         @Override
         protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
@@ -100,11 +64,35 @@ public class RegisterActivity extends AppCompatActivity {
                 Toast.makeText(RegisterActivity.this, "User Logged Out", Toast.LENGTH_LONG).show();
 
             } else {
-                loaduserprofile(currentAccessToken);
+                //loaduserprofile(currentAccessToken);
             }
 
         }
     };
+
+    // Getting app hash key for facebook login registration
+    private static void printHashKey(Context context) {
+        try {
+            PackageInfo info = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_SIGNATURES);
+            for (android.content.pm.Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                String hashKey = new String(Base64.encode(md.digest(), 0));
+                Log.i(TAG, "printHashKey: " + hashKey + "=");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "printHashKey: Error: " + e.getMessage());
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == LOGIN_TEXT_REQUEST_CODE) {
+            finish();
+        }
+    }
 
     private void loaduserprofile(AccessToken newAccessToken) {
         GraphRequest request = GraphRequest.newMeRequest(newAccessToken, new GraphRequest.GraphJSONObjectCallback() {
@@ -139,14 +127,53 @@ public class RegisterActivity extends AppCompatActivity {
 
     }
 
-    private void checkLoginStatus() {
-        if (AccessToken.getCurrentAccessToken() != null) {
-            loaduserprofile(AccessToken.getCurrentAccessToken());
-        }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_register);
+
+        printHashKey(this);
+        checkLoginStatus();
+
+        phone = findViewById(R.id.reg_contact);
+        password = findViewById(R.id.reg_password);
+        fullName = findViewById(R.id.reg_full_name);
+        emailET = findViewById(R.id.reg_email);
+        confirmPassword = findViewById(R.id.reg_confirm_password);
+
+        regFacebook = findViewById(R.id.reg_facebook);
+        regGoogle = findViewById(R.id.reg_google);
+        SignUp = findViewById(R.id.sign_up_button);
+        loginText = findViewById(R.id.create_act);
+
+        FacebookSdk.sdkInitialize(this);
+        callbackManager = CallbackManager.Factory.create();
+
+        regFacebook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LoginManager.getInstance().setAuthType(AUTH_TYPE)
+                        .logInWithReadPermissions(RegisterActivity.this, Arrays.asList(EMAIL));
+                facebookLogin();
+            }
+        });
+
+        // if user is already registered
+        loginText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivityForResult(new Intent(RegisterActivity.this, LoginActivity.class), LOGIN_TEXT_REQUEST_CODE);
+            }
+        });
     }
 
-
-
+    private void checkLoginStatus() {
+        if (AccessToken.getCurrentAccessToken() != null && !AccessToken.getCurrentAccessToken().isExpired()) {
+            // user already signed in
+            startActivity(new Intent(RegisterActivity.this, MainActivity.class));
+            finish();
+        }
+    }
 
 
 
@@ -248,5 +275,28 @@ public class RegisterActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
     }
 
+    public void facebookLogin() {
+        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Toast.makeText(RegisterActivity.this, "Successful", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "onSuccess: " + loginResult);
+                setResult(RESULT_OK);
+                startActivity(new Intent(RegisterActivity.this, MainActivity.class));
+                finish();
+                /*call : loginResult.getAccessToken().getUserId() to get userId and save to database;*/
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Toast.makeText(RegisterActivity.this, "Error " + error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 }
 
